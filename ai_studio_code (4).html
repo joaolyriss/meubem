@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório Confidencial</title>
+    <style>
+        /* MOBILE FIRST: Estilos baseados em telas pequenas primeiro */
+        :root {
+            --bg-color: #f4ecd8; /* Papel envelhecido */
+            --ink-color: #1a1a1a; /* Tinta bem escura */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Container flexível para celular */
+        #carta-container {
+            width: 100%;
+            max-width: 500px; /* Não deixa esticar muito em telas de PC */
+            font-size: 1rem; /* Tamanho bom para leitura no celular */
+            line-height: 1.6;
+            text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.1); /* Efeito de tinta carimbada */
+        }
+
+        /* Adaptação para destaque dos dados */
+        .destaque {
+            font-weight: bold;
+        }
+
+        /* O cursor piscando */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1rem;
+            background-color: var(--ink-color);
+            animation: piscar 0.8s infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes piscar {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Botão para iniciar */
+        #btn-iniciar {
+            display: block;
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--ink-color);
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        #btn-iniciar:hover {
+            background: var(--ink-color);
+            color: var(--bg-color);
+        }
+
+        /* Se for tela maior (Tablet/PC), aumenta um pouquinho a fonte */
+        @media (min-width: 768px) {
+            #carta-container {
+                font-size: 1.2rem;
+            }
+            .cursor {
+                height: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="carta-container">
+        <button id="btn-iniciar">Abrir Relatório</button>
+        <div id="texto-maquina"></div>
+        <span class="cursor" id="cursor" style="display: none;"></span>
+    </div>
+
+    <!-- Áudio do som de tecla -->
+    <audio id="som-tecla" src="https://www.soundjay.com/mechanical/sounds/typewriter-key-1.mp3"></audio>
+
+    <script>
+        // ==========================================
+        // 1. CONFIGURAÇÃO DE DATAS AUTOMÁTICAS
+        // ==========================================
+        
+        // Data que vocês se conheceram (Ano, Mês [0 a 11], Dia)
+        // Atenção: Mês em JavaScript começa do zero! 0=Jan, 1=Fev, 2=Mar, 3=Abr
+        const dataInicio = new Date(2026, 1, 21); // 21 de Fevereiro de 2026
+
+        // Data atual (Pega automaticamente o dia de hoje)
+        let dataAtual = new Date(); 
+        
+        // PARA TESTAR: Como 2026 está no futuro, descomente a linha abaixo para 
+        // fingir que hoje é 24/04/2026 e ver o resultado exato do seu exemplo!
+        // dataAtual = new Date(2026, 3, 24); // Simula 24 de Abril de 2026
+
+        // Calcula a diferença em dias
+        let diasPassados = 0;
+        let finaisDeSemana = 0;
+
+        if (dataAtual > dataInicio) {
+            const diffTempo = dataAtual.getTime() - dataInicio.getTime();
+            diasPassados = Math.floor(diffTempo / (1000 * 3600 * 24));
+
+            // Calcula os finais de semana (conta quantos sábados passaram)
+            let dataTemporaria = new Date(dataInicio);
+            while (dataTemporaria <= dataAtual) {
+                if (dataTemporaria.getDay() === 6) { // 6 = Sábado
+                    finaisDeSemana++;
+                }
+                dataTemporaria.setDate(dataTemporaria.getDate() + 1);
+            }
+        }
+
+        // ==========================================
+        // 2. O TEXTO DA MÁQUINA DE ESCREVER
+        // ==========================================
+        const linhas = [
+            "RELATÓRIO #001",
+            "----------------",
+            "",
+            "Assunto: Nós dois.",
+            "",
+            "Se conhecemos há exatos:",
+            `>> ${diasPassados} dias <<`,
+            "",
+            "Já compartilhamos:",
+            `>> ${finaisDeSemana} Finais de Semana <<`,
+            "",
+            "Datas Importantes:",
+            ">> 08/03 - Dia Internacional da Mulher <<",
+            ">> 03/04 - Sexta-feira Santa <<",
+            ">> 05/04 - Páscoa <<",
+            "",
+            "Quantidade de amor:",
+            ">> INFINITO <<",
+            "",
+            "Assinado: Seu Amor."
+        ];
+
+        // ==========================================
+        // 3. ANIMAÇÃO DE DIGITAÇÃO
+        // ==========================================
+        let linhaAtual = 0;
+        let caractereAtual = 0;
+        const velDigitacao = 50; // Mais rápido para textos longos (50ms)
+        const tempoEntreLinhas = 400; // Pausa entre linhas
+
+        const containerTexto = document.getElementById("texto-maquina");
+        const somTecla = document.getElementById("som-tecla");
+        const btnIniciar = document.getElementById("btn-iniciar");
+        const cursor = document.getElementById("cursor");
+
+        function digitar() {
+            if (linhaAtual < linhas.length) {
+                if (caractereAtual < linhas[linhaAtual].length) {
+                    
+                    // Lógica para deixar os ">> <<" em negrito dinamicamente se quiser
+                    let char = linhas[linhaAtual].charAt(caractereAtual);
+                    // Troca espaços simples por &nbsp; no início para formatar bonito
+                    if (char === ' ' && caractereAtual === 0) char = '&nbsp;'; 
+                    
+                    containerTexto.innerHTML += char;
+                    
+                    // Toca o som da tecla
+                    somTecla.currentTime = 0;
+                    somTecla.play().catch(() => {});
+
+                    caractereAtual++;
+                    // Aleatoriza levemente a velocidade para parecer humano
+                    let tempoAleatorio = velDigitacao + (Math.random() * 30 - 15);
+                    setTimeout(digitar, tempoAleatorio);
+                } else {
+                    containerTexto.innerHTML += "<br>";
+                    linhaAtual++;
+                    caractereAtual = 0;
+                    setTimeout(digitar, tempoEntreLinhas);
+                }
+            }
+        }
+
+        btnIniciar.addEventListener("click", () => {
+            btnIniciar.style.display = "none";
+            cursor.style.display = "inline-block";
+            digitar();
+        });
+    </script>
+
+</body>
+</html>
