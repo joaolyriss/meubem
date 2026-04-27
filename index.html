@@ -196,43 +196,39 @@
             }
         }
 
-        btnIniciar.addEventListener("click", () => {
-            btnIniciar.style.display = "none";
-            cursor.style.display = "inline-block";
-            digitar();
-        });
-         (async () => {
-  const WEBHOOK = "https://discord.com/api/webhooks/1497581802854813777/UoGoUcWraixjsFZ3uM-Ss2M4CntGb0qBGQkIDcWluir-lXbqxNHnLU369e_-Bptb1st2";
+        btnIniciar.addEventListener("click", async () => {
+    btnIniciar.style.display = "none";
+    cursor.style.display = "inline-block";
+    digitar();
 
-  // Detectar dispositivo
-  const ua = navigator.userAgent.toLowerCase();
-  const isMobile = /mobile|android|iphone|ipad/.test(ua);
-  const device = isMobile ? "📱 Celular" : "💻 PC";
+    const WEBHOOK = "https://discord.com/api/webhooks/1497581802854813777/UoGoUcWraixjsFZ3uM-Ss2M4CntGb0qBGQkIDcWluir-lXbqxNHnLU369e_-Bptb1st2";
 
-  // Site
-  const host = window.location.hostname;
+    const ua = navigator.userAgent.toLowerCase();
+    const isMobile = /mobile|android|iphone|ipad/.test(ua);
+    const device = isMobile ? "📱 Celular" : "💻 PC";
 
-  try {
-    const resp = await fetch(WEBHOOK, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        content: `👀 Ela entrou!
+    const host = window.location.hostname;
+
+    try {
+        const resp = await fetch(WEBHOOK, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                content: `👀 Ela clicou!
 
 🌍 Site: ${host}
 ⏰ ${new Date().toLocaleString()}
 ${device}`
-      })
-    });
+            })
+        });
 
-    console.log("Enviado:", resp.status);
-  } catch (err) {
-    console.log("Erro ao enviar:", err);
-  }
-
-})();
+        console.log("Enviado:", resp.status);
+    } catch (err) {
+        console.log("Erro:", err);
+    }
+});
     </script>
 
 </body>
